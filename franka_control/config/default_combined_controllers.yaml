@@ -1,5 +1,6 @@
 effort_joint_trajectory_controller:
   type: effort_controllers/JointTrajectoryController
+  allow_partial_joints_goal: true
   joints:
     - panda_2_joint1
     - panda_2_joint2
