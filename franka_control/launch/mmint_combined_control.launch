@@ -2,7 +2,7 @@
 <launch>
 
   <!-- The path to a robot description (xacro) file to control -->
-  <arg name="robot" default="/home/mmint/ws_panda/src/urdfs/mmint_combined_panda.urdf" />
+  <arg name="robot" default="$(find mmint_combined_panda_config)/urdfs/mmint_combined_panda.urdf" />
 
   <!-- Additional XACRO args. Be sure to escape colons and equal signs
        with backslashes, because XACRO use same syntax as roslaunch:

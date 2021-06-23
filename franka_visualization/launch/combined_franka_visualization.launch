@@ -6,7 +6,7 @@
   <arg name="panda_2_ip" default="192.168.1.23"/>
   <arg name="publish_rate" default="30" />
 
-  <param if="$(arg load_gripper)" name="robot_description" textfile="/home/mmint/ws_panda/src/urdfs/test.urdf" />
+  <param if="$(arg load_gripper)" name="robot_description" textfile="$(find mmint_combined_panda_config)/urdfs/mmint_combined_panda.urdf" />
 
   <node name="panda_1_joint_state_publisher" pkg="franka_visualization" type="robot_joint_state_publisher" output="screen">
     <rosparam command="load" file="$(find franka_visualization)/config/panda_1_settings.yaml" />
