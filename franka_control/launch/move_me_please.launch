@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="robot_id" default="combined_panda" />
+
+    <include file="$(find franka_control)/launch/mmint_combined_control.launch">
+        <arg name="robot_id" value="$(arg robot_id)"/>
+    </include>
+    <include file="$(find franka_gripper)/launch/combined_franka_gripper.launch" />
+    <group ns="$(arg robot_id)">
+        <include file="$(find mmint_combined_panda_config)/launch/mmint_combined_panda_moveit.launch" />    
+    </group>
+</launch>
