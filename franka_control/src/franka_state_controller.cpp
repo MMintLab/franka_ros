@@ -10,6 +10,7 @@
 #include <franka/errors.h>
 #include <franka_hw/franka_cartesian_command_interface.h>
 #include <franka_msgs/Errors.h>
+// #include <franka_msgs/RobotModel.h>
 #include <hardware_interface/hardware_interface.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
@@ -170,11 +171,28 @@ bool FrankaStateController::init(hardware_interface::RobotHW* robot_hardware,
     return false;
   }
 
-  publisher_transforms_.init(root_node_handle, "/tf", 1);
+  // auto* model_interface = robot_hardware->get<franka_hw::FrankaModelInterface>();
+  // if (model_interface == nullptr) {
+  //   ROS_ERROR_STREAM(
+  //       "FrankaStateController: Error getting model interface from hardware");
+  //   return false;
+  // }
+  // try {
+  //   model_handle_ = std::make_unique<franka_hw::FrankaModelHandle>(
+  //       model_interface->getHandle(arm_id + "_model"));
+  // } catch (hardware_interface::HardwareInterfaceException& ex) {
+  //   ROS_ERROR_STREAM(
+  //       "FrankaStateController: Exception getting model handle from interface: "
+  //       << ex.what());
+  //   return false;
+  // }
+
+  publisher_transforms_.init(root_node_handle, "/tf_franka", 1);
   publisher_franka_states_.init(controller_node_handle, "franka_states", 1);
   publisher_joint_states_.init(controller_node_handle, "joint_states", 1);
   publisher_joint_states_desired_.init(controller_node_handle, "joint_states_desired", 1);
   publisher_external_wrench_.init(controller_node_handle, "F_ext", 1);
+  // publisher_robot_model_.init(controller_node_handle, "robot_model", 1);
 
   {
     std::lock_guard<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> lock(
@@ -222,15 +240,34 @@ bool FrankaStateController::init(hardware_interface::RobotHW* robot_hardware,
     publisher_external_wrench_.msg_.wrench.torque.y = 0.0;
     publisher_external_wrench_.msg_.wrench.torque.z = 0.0;
   }
+  // {
+  //   std::lock_guard<realtime_tools::RealtimePublisher<franka_msgs::RobotModel>> lock(
+  //       publisher_robot_model_);
+  //   publisher_robot_model_.msg_.wrench.force.x = 0.0;
+  //   publisher_robot_model_.msg_.wrench.force.y = 0.0;
+  //   publisher_robot_model_.msg_.wrench.force.z = 0.0;
+  //   publisher_robot_model_.msg_.wrench.torque.x = 0.0;
+  //   publisher_robot_model_.msg_.wrench.torque.y = 0.0;
+  //   publisher_robot_model_.msg_.wrench.torque.z = 0.0;
+  // }
   return true;
 }
 
 void FrankaStateController::update(const ros::Time& time, const ros::Duration& /* period */) {
   if (trigger_publish_()) {
     robot_state_ = franka_state_handle_->getRobotState();
+    // std::array<double, 49> mass = model_handle_->getMass();
+    // std::array<double, 7> coriolis = model_handle_->getCoriolis();
+    // std::array<double, 7> gravity = model_handle_->getGravity();
+    // std::array<double, 16> pose = model_handle_->getPose(franka::Frame::kEndEffector);
+    // std::array<double, 42> EE_body_jacobian =
+    //     model_handle_->getBodyJacobian(franka::Frame::kEndEffector);
+    // std::array<double, 42> EE_zero_jacobian =
+    //     model_handle_->getZeroJacobian(franka::Frame::kEndEffector);
     publishFrankaStates(time);
     publishTransforms(time);
     publishExternalWrench(time);
+    // publishRobotModel(time, mass, coriolis, gravity, pose, EE_body_jacobian, EE_zero_jacobian)
     publishJointStates(time);
     sequence_number_++;
   }
@@ -455,6 +492,35 @@ void FrankaStateController::publishExternalWrench(const ros::Time& time) {
     publisher_external_wrench_.unlockAndPublish();
   }
 }
+
+// void FrankaStateController::publishRobotModel(const ros::Time& time, mass, coriolis, gravity, pose, EE_body_jacobian, EE_zero_jacobian) {
+//   if (publisher_robot_model_.trylock()) {
+//     publisher_robot_model_.msg_.header.stamp = time;
+//     publisher_robot_model_.msg_.header.seq = sequence_number_;
+//     for (size_t i = 0; i < pose.size(); i++) {
+//       publisher_robot_model_.msg_.pose[i] = pose[i];
+//     }
+
+//     static_assert(sizeof(bodyJacobian) == sizeof(zeroJacobian),
+//                   "Jacobians do not have same size");
+//     for (size_t i = 0; i < EE_body_jacobian.size(); i++) {
+//       publisher_robot_model_.msg_.bodyJacobian[i] = EE_body_jacobian[i];
+//       publisher_robot_model_.msg_.zeroJacobian[i] = EE_zero_jacobian[i];
+//     }
+
+//     for (size_t i = 0; i < mass.size(); i++) {
+//       publisher_robot_model_.msg_.mass[i] = mass[i];
+//     }
+
+//     static_assert(sizeof(coriolis) == sizeof(gravity),
+//                   "Dynamics do not have same size");
+//     for (size_t i = 0; i < coriolis.size(); i++) {
+//       publisher_robot_model_.msg_.coriolis[i] = coriolis[i];
+//       publisher_robot_model_.msg_.gravity[i] = gravity[i];
+//     }
+//     publisher_robot_model_.unlockAndPublish();
+//   }
+// }
 
 }  // namespace franka_control
 

@@ -10,6 +10,7 @@
 #include <franka_hw/franka_state_interface.h>
 #include <franka_hw/trigger_rate.h>
 #include <franka_msgs/FrankaState.h>
+// #include <franka_msgs/RobotModel.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <sensor_msgs/JointState.h>
@@ -52,14 +53,17 @@ class FrankaStateController
   void publishJointStates(const ros::Time& time);
   void publishTransforms(const ros::Time& time);
   void publishExternalWrench(const ros::Time& time);
+  void publishRobotModel(const ros::Time& time);
 
   std::string arm_id_;
 
   franka_hw::FrankaStateInterface* franka_state_interface_{};
   std::unique_ptr<franka_hw::FrankaStateHandle> franka_state_handle_{};
+  // std::unique_ptr<franka_hw::FrankaModelHandle> model_handle_{};
 
   realtime_tools::RealtimePublisher<tf2_msgs::TFMessage> publisher_transforms_;
   realtime_tools::RealtimePublisher<franka_msgs::FrankaState> publisher_franka_states_;
+  // realtime_tools::RealtimePublisher<franka_msgs::RobotModel> publisher_robot_model_;
   realtime_tools::RealtimePublisher<sensor_msgs::JointState> publisher_joint_states_;
   realtime_tools::RealtimePublisher<sensor_msgs::JointState> publisher_joint_states_desired_;
   realtime_tools::RealtimePublisher<geometry_msgs::WrenchStamped> publisher_external_wrench_;
