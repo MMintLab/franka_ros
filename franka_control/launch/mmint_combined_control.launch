@@ -25,12 +25,14 @@
   <arg name="controllers_file" default="$(find franka_control)/config/default_combined_controllers.yaml" />
 
   <!-- The space separated list of controllers to start in this launch files. The controllers should be known from the controllers_file -->
+  <!-- <arg name="controllers_to_start" default="panda_1_cartesian_impedance_controller panda_1_state_controller panda_2_state_controller"/> -->
+  <!-- <arg name="controllers_to_start" default="dual_arm_cartesian_impedance_example_controller panda_1_state_controller panda_2_state_controller"/> -->
   <arg name="controllers_to_start" default="effort_joint_trajectory_controller panda_1_state_controller panda_2_state_controller"/>
 
   <!-- The list of the joint_states topics of all combined robots to fuse to a complete topic -->
   <arg name="joint_states_source_list" default="[panda_1_state_controller/joint_states, panda_2_state_controller/joint_states, panda_1/franka_gripper/joint_states, panda_2/franka_gripper/joint_states]"/>
 
-  <node name="$(arg robot_id)" pkg="franka_control" type="franka_combined_control_node" output="screen" required="true" >
+  <node launch-prefix="terminator -x gdb --args" name="$(arg robot_id)" pkg="franka_control" type="franka_combined_control_node" output="screen" required="true" >
     <rosparam command="load" file="$(arg hw_config_file)" />
     <!-- Add or overwrite manually configured ips -->
     <rosparam subst_value="True">$(arg robot_ips)</rosparam>

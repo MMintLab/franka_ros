@@ -62,6 +62,31 @@ effort_joint_trajectory_controller:
     panda_2_joint6: {p: 150, d: 10, i: 0, i_clamp: 1}
     panda_2_joint7: {p: 50, d: 5, i: 0, i_clamp: 1}
 
+# panda_1_cartesian_impedance_controller:
+#     type: franka_example_controllers/CartesianImpedanceExampleController
+#     arm_id: panda_1
+#     joint_names:
+#         - panda_1_joint1
+#         - panda_1_joint2
+#         - panda_1_joint3
+#         - panda_1_joint4
+#         - panda_1_joint5
+#         - panda_1_joint6
+#         - panda_1_joint7
+
+# panda_2_cartesian_impedance_controller:
+#     type: franka_example_controllers/CartesianImpedanceExampleController
+#     arm_id: panda_2
+#     joint_names:
+#         - panda_2_joint1
+#         - panda_2_joint2
+#         - panda_2_joint3
+#         - panda_2_joint4
+#         - panda_2_joint5
+#         - panda_2_joint6
+#         - panda_2_joint7
+
+
 panda_1_state_controller:
   type: franka_control/FrankaStateController
   arm_id: panda_1

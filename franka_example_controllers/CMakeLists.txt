@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(franka_example_controllers)
 
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -60,17 +60,18 @@ catkin_package(
 )
 
 add_library(franka_example_controllers
-  src/elbow_example_controller.cpp
-  src/cartesian_pose_example_controller.cpp
-  src/cartesian_velocity_example_controller.cpp
-  src/joint_position_example_controller.cpp
-  src/joint_velocity_example_controller.cpp
-  src/model_example_controller.cpp
-  src/joint_impedance_example_controller.cpp
-  src/cartesian_impedance_example_controller.cpp
-  src/force_example_controller.cpp
-  src/dual_arm_cartesian_impedance_example_controller.cpp
-  src/teleop_joint_pd_example_controller.cpp
+  # src/elbow_example_controller.cpp
+  # src/cartesian_pose_example_controller.cpp
+  # src/cartesian_velocity_example_controller.cpp
+  # src/joint_position_example_controller.cpp
+  # src/joint_velocity_example_controller.cpp
+  # src/model_example_controller.cpp
+  # src/joint_impedance_example_controller.cpp
+  # src/cartesian_impedance_example_controller.cpp
+  # src/force_example_controller.cpp
+  # src/dual_arm_cartesian_impedance_example_controller.cpp
+  src/mmint_dual_arm_cartesian_impedance_controller.cpp
+  # src/teleop_joint_pd_example_controller.cpp
 )
 
 add_dependencies(franka_example_controllers
@@ -129,7 +130,7 @@ install(FILES franka_example_controllers_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 catkin_install_python(
-  PROGRAMS scripts/interactive_marker.py scripts/move_to_start.py scripts/dual_arm_interactive_marker.py
+  PROGRAMS scripts/interactive_marker.py scripts/move_to_start.py scripts/dual_arm_interactive_marker.py scripts/mmint_dual_arm_interactive_marker.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
