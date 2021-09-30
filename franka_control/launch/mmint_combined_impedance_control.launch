@@ -22,12 +22,11 @@
   <arg name="robot_ips" default="{panda_1/robot_ip: $(arg panda_1_ip), panda_2/robot_ip: $(arg panda_2_ip)}"/>
 
   <!-- The config file containing the parameterization for all controllers to start with this launch file -->
-  <arg name="controllers_file" default="$(find franka_control)/config/default_combined_controllers.yaml" />
+  <!-- <arg name="controllers_file" default="$(find franka_control)/config/default_combined_controllers.yaml" /> -->
+  <arg name="controllers_file" default="$(find franka_example_controllers)/config/franka_example_controllers.yaml" />
 
   <!-- The space separated list of controllers to start in this launch files. The controllers should be known from the controllers_file -->
-  <!-- <arg name="controllers_to_start" default="panda_1_cartesian_impedance_controller panda_1_state_controller panda_2_state_controller"/> -->
-  <!-- <arg name="controllers_to_start" default="dual_arm_cartesian_impedance_example_controller panda_1_state_controller panda_2_state_controller"/> -->
-  <arg name="controllers_to_start" default="effort_joint_trajectory_controller panda_1_state_controller panda_2_state_controller"/>
+  <arg name="controllers_to_start" default="panda_1_cartesian_impedance_controller panda_2_cartesian_impedance_controller panda_1_state_controller panda_2_state_controller"/>
 
   <!-- The list of the joint_states topics of all combined robots to fuse to a complete topic -->
   <arg name="joint_states_source_list" default="[panda_1_state_controller/joint_states, panda_2_state_controller/joint_states, panda_1/franka_gripper/joint_states, panda_2/franka_gripper/joint_states]"/>
@@ -52,4 +51,5 @@
       <param name="rate" value="30"/>
     </node>
   </group>
+  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" required="false" />
 </launch>

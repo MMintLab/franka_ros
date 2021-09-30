@@ -59,4 +59,14 @@
           A PD controller that tracks position and velocity of the leader arm and applies it to the follower arm. It also applies force-feedback to the leader arm.
       </description>
   </class>
+  <class name="franka_example_controllers/Panda1ImpedanceController" type="franka_example_controllers::Panda1ImpedanceController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A controller that renders a spring damper system in cartesian space. Compliance parameters and the equilibrium pose can be modified online with dynamic reconfigure and an interactive marker respectively.
+    </description>
+  </class>
+  <class name="franka_example_controllers/Panda2ImpedanceController" type="franka_example_controllers::Panda2ImpedanceController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A controller that renders a spring damper system in cartesian space. Compliance parameters and the equilibrium pose can be modified online with dynamic reconfigure and an interactive marker respectively.
+    </description>
+  </class>
 </library>

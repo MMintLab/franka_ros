@@ -33,6 +33,8 @@ generate_messages()
 
 generate_dynamic_reconfigure_options(
   cfg/compliance_param.cfg
+  cfg/panda_1_compliance_param.cfg
+  cfg/panda_2_compliance_param.cfg
   cfg/desired_mass_param.cfg
   cfg/dual_arm_compliance_param.cfg
   cfg/teleop_param.cfg
@@ -70,8 +72,10 @@ add_library(franka_example_controllers
   # src/cartesian_impedance_example_controller.cpp
   # src/force_example_controller.cpp
   # src/dual_arm_cartesian_impedance_example_controller.cpp
-  src/mmint_dual_arm_cartesian_impedance_controller.cpp
+  # src/mmint_dual_arm_cartesian_impedance_controller.cpp
   # src/teleop_joint_pd_example_controller.cpp
+  src/panda_1_cartesian_impedance_controller.cpp
+  src/panda_2_cartesian_impedance_controller.cpp
 )
 
 add_dependencies(franka_example_controllers
