@@ -7,42 +7,97 @@ import numpy as np
 from interactive_markers.interactive_marker_server import \
     InteractiveMarkerServer, InteractiveMarkerFeedback
 from visualization_msgs.msg import InteractiveMarker, \
-    InteractiveMarkerControl
+    InteractiveMarkerControl, Marker
 from geometry_msgs.msg import PoseStamped
 from franka_msgs.msg import FrankaState
 
 left_marker_pose = PoseStamped()
-left_initial_pose_found = False
+left_frame_ready = False
+left_has_error = False
 left_pose_pub = None
 # [[min_x, max_x], [min_y, max_y], [min_z, max_z]]
 position_limits = [[-0.6, 0.6], [-0.6, 0.6], [0.05, 0.9]]
 
+def make_sphere(scale=0.3):
+    """
+    This function returns sphere marker for 3D translational movements.
+    :param scale: scales the size of the sphere
+    :return: sphere marker
+    """
+    marker = Marker()
+    marker.type = Marker.SPHERE
+    marker.scale.x = scale * 0.45
+    marker.scale.y = scale * 0.45
+    marker.scale.z = scale * 0.45
+    marker.color.r = 0.5
+    marker.color.g = 0.5
+    marker.color.b = 0.5
+    marker.color.a = 1.0
+    return marker
 
-def leftPublisherCallback(msg, link_name):
-    left_marker_pose.header.frame_id = link_name
+
+def publish_left_target_pose():
+    """
+    This function publishes left desired pose which the controller will subscribe to.
+    :return: None
+    """
+    left_marker_pose.header.frame_id = "panda_1_link0"
     left_marker_pose.header.stamp = rospy.Time(0)
     left_pose_pub.publish(left_marker_pose)
 
 
-def left_franka_state_callback(msg):
-    initial_quaternion = \
-        tf.transformations.quaternion_from_matrix(
-            np.transpose(np.reshape(msg.O_T_EE,
-                                    (4, 4))))
-    initial_quaternion = initial_quaternion / np.linalg.norm(initial_quaternion)
-    left_marker_pose.pose.orientation.x = initial_quaternion[0]
-    left_marker_pose.pose.orientation.y = initial_quaternion[1]
-    left_marker_pose.pose.orientation.z = initial_quaternion[2]
-    left_marker_pose.pose.orientation.w = initial_quaternion[3]
+def left_pose_callback(msg):
+    """
+    This callback function sets the left marker pose to the current left pose from a subscribed topic.
+    :return: None
+    """
+    global left_frame_ready
+    global left_marker_pose
+
+    curr_quaternion = tf.transformations.quaternion_from_matrix(
+            np.transpose(np.reshape(msg.O_T_EE, (4, 4))))
+    curr_quaternion = curr_quaternion / np.linalg.norm(curr_quaternion)
+    left_marker_pose.pose.orientation.x = curr_quaternion[0]
+    left_marker_pose.pose.orientation.y = curr_quaternion[1]
+    left_marker_pose.pose.orientation.z = curr_quaternion[2]
+    left_marker_pose.pose.orientation.w = curr_quaternion[3]
     left_marker_pose.pose.position.x = msg.O_T_EE[12]
     left_marker_pose.pose.position.y = msg.O_T_EE[13]
     left_marker_pose.pose.position.z = msg.O_T_EE[14]
-    global left_initial_pose_found
-    left_initial_pose_found = True
+    left_frame_ready = True
 
 
-def leftProcessFeedback(feedback):
-    if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
+def reset_left_marker_pose_blocking():
+    """
+    This function resets the marker pose to current left arm EE.
+    :return: None
+    """
+
+    global left_frame_ready, left_marker_pose
+
+    left_frame_ready = False
+
+    left_frame_pose_sub = rospy.Subscriber(
+        "/combined_panda/panda_1_state_controller/franka_states",
+        PoseStamped, left_pose_callback)
+
+    # Get initial pose for the interactive marker
+    while not left_frame_ready:
+        rospy.sleep(0.1)
+
+    left_frame_pose_sub.unregister()
+
+
+def left_state_callback(msg):
+    global left_has_error
+    if msg.robot_mode == FrankaState.ROBOT_MODE_MOVE:
+        left_has_error = False
+    else:
+        left_has_error = True
+
+
+def left_process_feedback(feedback):
+    if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not left_has_error:
         left_marker_pose.pose.position.x = max([min([feedback.pose.position.x,
                                           position_limits[0][1]]),
                                           position_limits[0][0]])
@@ -52,23 +107,25 @@ def leftProcessFeedback(feedback):
         left_marker_pose.pose.position.z = max([min([feedback.pose.position.z,
                                           position_limits[2][1]]),
                                           position_limits[2][0]])
-        left_marker_pose.pose.orientation = feedback.pose.orientation
+        curr_quaternion = np.array([feedback.pose.orientation.x, feedback.pose.orientation.y, feedback.pose.orientation.z, feedback.pose.orientation.w])
+        curr_quaternion = curr_quaternion / np.linalg.norm(curr_quaternion)
+        left_marker_pose.pose.orientation.x = curr_quaternion[0]
+        left_marker_pose.pose.orientation.y = curr_quaternion[1]
+        left_marker_pose.pose.orientation.z = curr_quaternion[2]
+        left_marker_pose.pose.orientation.w = curr_quaternion[3]
     left_server.applyChanges()
 
 
 if __name__ == "__main__":
     rospy.init_node("panda_1_equilibrium_pose_node")
     left_state_sub = rospy.Subscriber("/combined_panda/panda_1_state_controller/franka_states",
-                                 FrankaState, left_franka_state_callback)
+                                 FrankaState, left_state_callback)
 
     listener = tf.TransformListener()
     left_link_name = "panda_1_link0"
-    base_frame = "base"
 
     # Get initial pose for the interactive marker
-    while not left_initial_pose_found:
-        rospy.sleep(1)
-    left_state_sub.unregister()
+    reset_left_marker_pose_blocking()
 
     left_pose_pub = rospy.Publisher(
         "panda_1_equilibrium_pose", PoseStamped, queue_size=10)
@@ -81,10 +138,6 @@ if __name__ == "__main__":
     left_int_marker.name = "panda_1_equilibrium_pose"
     left_int_marker.description = ("Nebula")
     left_int_marker.pose = left_marker_pose.pose
-
-    # run pose publisher
-    rospy.Timer(rospy.Duration(0.005),
-                lambda msg: leftPublisherCallback(msg, left_link_name))
    
     # insert a box
     control = InteractiveMarkerControl()
@@ -141,8 +194,26 @@ if __name__ == "__main__":
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
     left_int_marker.controls.append(control)
 
-    left_server.insert(left_int_marker, leftProcessFeedback)
+    control = InteractiveMarkerControl()
+    control.orientation.w = 1
+    control.orientation.x = 1
+    control.orientation.y = 1
+    control.orientation.z = 1
+    control.name = "move_3D"
+    control.always_visible = True
+    control.markers.append(make_sphere())
+    control.interaction_mode = InteractiveMarkerControl.MOVE_3D
+    left_int_marker.controls.append(control)
 
+    left_server.insert(left_int_marker, left_process_feedback)
     left_server.applyChanges()
 
-    rospy.spin()
+    while not rospy.is_shutdown():
+        publish_left_target_pose()
+        if left_has_error:
+            reset_left_marker_pose_blocking()
+            publish_left_target_pose()
+            left_server.setPose("panda_1_equilibrium_pose", left_marker_pose.pose)
+            left_server.applyChanges()
+            rospy.sleep(0.5)
+        rospy.sleep(0.1)
