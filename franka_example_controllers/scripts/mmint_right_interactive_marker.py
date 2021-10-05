@@ -58,6 +58,8 @@ def rightProcessFeedback(feedback):
 
 if __name__ == "__main__":
     rospy.init_node("panda_2_equilibrium_pose_node")
+    right_state_sub = rospy.Subscriber("/combined_panda/panda_2_state_controller/franka_states",
+                                 FrankaState, right_franka_state_callback)
 
     listener = tf.TransformListener()
     right_link_name = "panda_2_link0"

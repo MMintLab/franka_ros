@@ -58,7 +58,7 @@ def leftProcessFeedback(feedback):
 
 if __name__ == "__main__":
     rospy.init_node("panda_1_equilibrium_pose_node")
-    left_state_sub = rospy.Subscriber("panda_1_state_controller/franka_states",
+    left_state_sub = rospy.Subscriber("/combined_panda/panda_1_state_controller/franka_states",
                                  FrankaState, left_franka_state_callback)
 
     listener = tf.TransformListener()
