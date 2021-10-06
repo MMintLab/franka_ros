@@ -97,7 +97,7 @@ def left_state_callback(msg):
 
 
 def left_process_feedback(feedback):
-    if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not left_has_error:
+    if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not left_has_error and not feedback.mouse_point_valid:
         left_marker_pose.pose.position.x = max([min([feedback.pose.position.x,
                                           position_limits[0][1]]),
                                           position_limits[0][0]])
@@ -113,6 +113,10 @@ def left_process_feedback(feedback):
         left_marker_pose.pose.orientation.y = curr_quaternion[1]
         left_marker_pose.pose.orientation.z = curr_quaternion[2]
         left_marker_pose.pose.orientation.w = curr_quaternion[3]
+    elif feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not left_has_error and feedback.mouse_point_valid:
+        reset_left_marker_pose_blocking()
+        publish_left_target_pose()
+        left_server.setPose("panda_1_equilibrium_pose", left_marker_pose.pose)
     left_server.applyChanges()
 
 

@@ -97,7 +97,7 @@ def right_state_callback(msg):
 
 
 def right_process_feedback(feedback):
-    if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not right_has_error:
+    if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not right_has_error and not feedback.mouse_point_valid:
         right_marker_pose.pose.position.x = max([min([feedback.pose.position.x,
                                           position_limits[0][1]]),
                                           position_limits[0][0]])
@@ -113,7 +113,12 @@ def right_process_feedback(feedback):
         right_marker_pose.pose.orientation.y = curr_quaternion[1]
         right_marker_pose.pose.orientation.z = curr_quaternion[2]
         right_marker_pose.pose.orientation.w = curr_quaternion[3]
+    elif feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE and not right_has_error and feedback.mouse_point_valid:
+        reset_right_marker_pose_blocking()
+        publish_right_target_pose()
+        right_server.setPose("panda_2_equilibrium_pose", right_marker_pose.pose)
     right_server.applyChanges()
+
 
 
 if __name__ == "__main__":
@@ -192,17 +197,6 @@ if __name__ == "__main__":
     control.orientation.z = 1
     control.name = "move_z"
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
-    right_int_marker.controls.append(control)
-
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 1
-    control.orientation.y = 1
-    control.orientation.z = 1
-    control.name = "move_3D"
-    control.always_visible = True
-    control.markers.append(make_sphere())
-    control.interaction_mode = InteractiveMarkerControl.MOVE_3D
     right_int_marker.controls.append(control)
 
     right_server.insert(right_int_marker, right_process_feedback)
