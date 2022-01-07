@@ -69,4 +69,14 @@
       A controller that renders a spring damper system in cartesian space. Compliance parameters and the equilibrium pose can be modified online with dynamic reconfigure and an interactive marker respectively.
     </description>
   </class>
+   <class name="franka_example_controllers/Panda1JointImpedanceController" type="franka_example_controllers::Panda1JointImpedanceController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A controller that tracks a cartesian path with a joint impedance controller that compensates coriolis torques. The torque commands are compared to measured torques in Console outputs.
+    </description>
+  </class>
+   <class name="franka_example_controllers/Panda2JointImpedanceController" type="franka_example_controllers::Panda2JointImpedanceController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A controller that tracks a cartesian path with a joint impedance controller that compensates coriolis torques. The torque commands are compared to measured torques in Console outputs.
+    </description>
+  </class>
 </library>

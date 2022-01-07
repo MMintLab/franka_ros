@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1
-        - /TF1/Frames1
       Splitter Ratio: 0.6555555462837219
     Tree Height: 1166
   - Class: rviz/Selection
@@ -316,24 +314,6 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: rviz/InteractiveMarkers
-      Enable Transparency: true
-      Enabled: true
-      Name: InteractiveMarkers
-      Show Axes: true
-      Show Descriptions: true
-      Show Visual Aids: true
-      Update Topic: /combined_panda/left_target_pose_marker/update
-      Value: true
-    - Class: rviz/InteractiveMarkers
-      Enable Transparency: true
-      Enabled: true
-      Name: InteractiveMarkers
-      Show Axes: true
-      Show Descriptions: true
-      Show Visual Aids: true
-      Update Topic: /combined_panda/right_target_pose_marker/update
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -370,17 +350,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.421579509973526
-        Y: -0.042340077459812164
-        Z: 1.5082550048828125
+        X: 0.2776314616203308
+        Y: -0.32707494497299194
+        Z: 1.0712254047393799
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.32479608058929443
+      Pitch: 0.27479615807533264
       Target Frame: <Fixed Frame>
-      Yaw: 2.853609323501587
+      Yaw: 5.418622016906738
     Saved: ~
 Window Geometry:
   Displays:

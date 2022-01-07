@@ -26,13 +26,13 @@
   <arg name="controllers_file" default="$(find franka_example_controllers)/config/franka_example_controllers.yaml" />
 
   <!-- The space separated list of controllers to start in this launch files. The controllers should be known from the controllers_file -->
-  <arg name="controllers_to_start" default="panda_1_cartesian_impedance_controller panda_2_cartesian_impedance_controller panda_1_state_controller panda_2_state_controller"/>
+  <arg name="controllers_to_start" default="panda_2_joint_impedance_controller panda_1_state_controller panda_2_state_controller"/>
 
   <!-- The list of the joint_states topics of all combined robots to fuse to a complete topic -->
   <arg name="joint_states_source_list" default="[panda_1_state_controller/joint_states, panda_2_state_controller/joint_states, panda_1/franka_gripper/joint_states, panda_2/franka_gripper/joint_states]"/>
 
   <node name="$(arg robot_id)" pkg="franka_control" type="franka_combined_control_node" output="screen" required="true" >
-    <rosparam command="load" file="$(arg hw_config_file)" />
+    <rosparam command="load" file="$(arg hw_config_file)" /> 
     <!-- Add or overwrite manually configured ips -->
     <rosparam subst_value="True">$(arg robot_ips)</rosparam>
     <param name="robot_description" textfile="$(arg robot)" />
@@ -51,9 +51,5 @@
       <param name="rate" value="30"/>
     </node>
   </group>
-  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" required="false" />
-  <!-- <node pkg="rviz" type="rviz" output="screen" name="rviz" args="-d $(find franka_example_controllers)/launch/rviz/mmint_description_with_dual_marker.rviz"/> -->
   <node pkg="rviz" type="rviz" output="screen" name="rviz" args="-d $(find franka_example_controllers)/launch/rviz/mmint_dual_description.rviz"/>
-  <!-- <node name="left_interactive_marker" pkg="franka_example_controllers" type="mmint_left_interactive_marker.py" required="true" output="screen" /> -->
-  <!-- <node name="right_interactive_marker" pkg="franka_example_controllers" type="mmint_right_interactive_marker.py" required="true" output="screen" /> -->
 </launch>

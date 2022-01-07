@@ -198,17 +198,6 @@ if __name__ == "__main__":
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
     left_int_marker.controls.append(control)
 
-    control = InteractiveMarkerControl()
-    control.orientation.w = 1
-    control.orientation.x = 1
-    control.orientation.y = 1
-    control.orientation.z = 1
-    control.name = "move_3D"
-    control.always_visible = True
-    control.markers.append(make_sphere())
-    control.interaction_mode = InteractiveMarkerControl.MOVE_3D
-    left_int_marker.controls.append(control)
-
     left_server.insert(left_int_marker, left_process_feedback)
     left_server.applyChanges()
 
