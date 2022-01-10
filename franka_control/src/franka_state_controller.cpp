@@ -262,18 +262,10 @@ bool FrankaStateController::init(hardware_interface::RobotHW* robot_hardware,
 void FrankaStateController::update(const ros::Time& time, const ros::Duration& /* period */) {
   if (trigger_publish_()) {
     robot_state_ = franka_state_handle_->getRobotState();
-    // std::array<double, 49> mass = model_handle_->getMass();
-    // std::array<double, 7> coriolis = model_handle_->getCoriolis();
-    // std::array<double, 7> gravity = model_handle_->getGravity();
-    // std::array<double, 16> pose = model_handle_->getPose(franka::Frame::kEndEffector);
-    // std::array<double, 42> EE_body_jacobian =
-    //     model_handle_->getBodyJacobian(franka::Frame::kEndEffector);
-    // std::array<double, 42> EE_zero_jacobian =
-    //     model_handle_->getZeroJacobian(franka::Frame::kEndEffector);
     publishFrankaStates(time);
     publishTransforms(time);
     publishExternalWrench(time);
-    // publishRobotModel(time, mass, coriolis, gravity, pose, EE_body_jacobian, EE_zero_jacobian)
+    // publishRobotModel(time)
     publishJointStates(time);
     sequence_number_++;
   }
@@ -511,30 +503,36 @@ void FrankaStateController::publishExternalWrench(const ros::Time& time) {
   }
 }
 
-// void FrankaStateController::publishRobotModel(const ros::Time& time, mass, coriolis, gravity, pose, EE_body_jacobian, EE_zero_jacobian) {
+// void FrankaStateController::publishRobotModel(const ros::Time& time) {
 //   if (publisher_robot_model_.trylock()) {
 //     publisher_robot_model_.msg_.header.stamp = time;
 //     publisher_robot_model_.msg_.header.seq = sequence_number_;
+//     curr_pose = model_.pose;
 //     for (size_t i = 0; i < pose.size(); i++) {
-//       publisher_robot_model_.msg_.pose[i] = pose[i];
+//       publisher_robot_model_.msg_.pose[i] = curr_pose[i];
 //     }
 
-//     static_assert(sizeof(bodyJacobian) == sizeof(zeroJacobian),
+//     curr_body_jacobian = model_.bodyJacobian;
+//     curr_zero_jacobian = model_.zeroJacobian;
+//     static_assert(sizeof(curr_body_jacobian) == sizeof(curr_zero_jacobian),
 //                   "Jacobians do not have same size");
-//     for (size_t i = 0; i < EE_body_jacobian.size(); i++) {
-//       publisher_robot_model_.msg_.bodyJacobian[i] = EE_body_jacobian[i];
-//       publisher_robot_model_.msg_.zeroJacobian[i] = EE_zero_jacobian[i];
+//     for (size_t i = 0; i < curr_body_jacobian.size(); i++) {
+//       publisher_robot_model_.msg_.bodyJacobian[i] = curr_body_jacobian[i];
+//       publisher_robot_model_.msg_.zeroJacobian[i] = curr_zero_jacobian[i];
 //     }
 
+//     curr_mass = model_.mass;
 //     for (size_t i = 0; i < mass.size(); i++) {
-//       publisher_robot_model_.msg_.mass[i] = mass[i];
+//       publisher_robot_model_.msg_.mass[i] = curr_mass[i];
 //     }
 
-//     static_assert(sizeof(coriolis) == sizeof(gravity),
+//     curr_coriolis = model_.coriolis;
+//     curr_gravity = model_.gravity;
+//     static_assert(sizeof(curr_coriolis) == sizeof(curr_gravity),
 //                   "Dynamics do not have same size");
-//     for (size_t i = 0; i < coriolis.size(); i++) {
-//       publisher_robot_model_.msg_.coriolis[i] = coriolis[i];
-//       publisher_robot_model_.msg_.gravity[i] = gravity[i];
+//     for (size_t i = 0; i < curr_coriolis.size(); i++) {
+//       publisher_robot_model_.msg_.coriolis[i] = curr_coriolis[i];
+//       publisher_robot_model_.msg_.gravity[i] = curr_gravity[i];
 //     }
 //     publisher_robot_model_.unlockAndPublish();
 //   }
