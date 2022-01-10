@@ -171,6 +171,7 @@ bool FrankaStateController::init(hardware_interface::RobotHW* robot_hardware,
     return false;
   }
 
+  std::cout << "franka_state_controller.cpp line 174\n";
   auto* model_interface = robot_hardware->get<franka_hw::FrankaModelInterface>();
   if (model_interface == nullptr) {
     ROS_ERROR_STREAM(
