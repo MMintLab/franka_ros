@@ -268,12 +268,12 @@ class FrankaModelHandle {
     return model_->zeroJacobian(frame, q, F_T_EE, EE_T_K);
   }
 
-  /**
-   * Gets the current robot state.
-   *
-   * @return Current robot state.
-   */
-  const franka::Model& getRobotModel() const noexcept { return *model_; }
+  // /**
+  //  * Gets the current robot state.
+  //  *
+  //  * @return Current robot state.
+  //  */
+  // const franka::Model& getRobotModel() const noexcept { return *model_; }
 
  private:
   std::string name_;
