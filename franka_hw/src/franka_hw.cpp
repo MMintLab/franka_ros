@@ -429,7 +429,6 @@ void FrankaHW::setupFrankaModelInterface(franka::RobotState& robot_state) {
     franka_hw::FrankaModelHandle model_handle(arm_id_ + "_model", *model_, robot_state);
     franka_model_interface_.registerHandle(model_handle);
     registerInterface(&franka_model_interface_);
-    std::cout << "franka_hw.cpp line 432\n";
   }
 }
 
