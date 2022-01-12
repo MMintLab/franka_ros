@@ -1,13 +1,15 @@
 <?xml version="1.0" ?>
 <launch>
+  <arg name="robot_urdf" default="mmint_combined_panda"/>
+  <arg name="arm_id_1" default="panda_1"/>
+  <arg name="arm_id_2" default="panda_2"/>
+  <arg name="hand_1" default="panda_hand"/>
+  <arg name="hand_2" default="panda_hand"/>
+  <arg name="tool_1" default=""/>
+  <arg name="tool_2" default=""/>
 
   <!-- The path to a robot description (xacro) file to control -->
-  <arg name="robot" default="$(find mmint_combined_panda_config)/urdfs/mmint_combined_panda.urdf" />
-
-  <!-- Additional XACRO args. Be sure to escape colons and equal signs
-       with backslashes, because XACRO use same syntax as roslaunch:
-       roslaunch <pkg> <launchfile> robot:=path/to/urdf.xacro args:="foo\:\=bar other\:\=true"  -->
-  <arg name="args" default="" />
+  <arg name="robot" default="$(find mmint_combined_panda_config)/config/$(arg robot_urdf).urdf.xacro" />
 
   <!-- The name of the combined robot, used as control node name -->
   <arg name="robot_id" default="combined_panda" />
@@ -34,7 +36,10 @@
     <rosparam command="load" file="$(arg hw_config_file)" />
     <!-- Add or overwrite manually configured ips -->
     <rosparam subst_value="True">$(arg robot_ips)</rosparam>
-    <param name="robot_description" textfile="$(arg robot)" />
+    <param name="robot_description" command="$(find xacro)/xacro '$(find mmint_combined_panda_config)/config/$(arg robot_urdf).urdf.xacro'
+                       arm_id_1:=$(arg arm_id_1) arm_id_2:=$(arg arm_id_2)
+                       hand_1:=$(arg hand_1) hand_2:=$(arg hand_2)
+                       tool_1:=$(arg tool_1) tool_2:=$(arg tool_2)"/>
   </node>
 
   <group ns="$(arg robot_id)">
@@ -45,7 +50,10 @@
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
     <node name="joint_state_publisher" type="joint_state_publisher" pkg="joint_state_publisher" output="screen">
-      <param name="robot_description" textfile="$(arg robot)" />
+      <param name="robot_description" command="$(find xacro)/xacro '$(find mmint_combined_panda_config)/config/$(arg robot_urdf).urdf.xacro'
+                       arm_id_1:=$(arg arm_id_1) arm_id_2:=$(arg arm_id_2)
+                       hand_1:=$(arg hand_1) hand_2:=$(arg hand_2)
+                       tool_1:=$(arg tool_1) tool_2:=$(arg tool_2)"/>
       <rosparam param="source_list"  subst_value="true">$(arg joint_states_source_list)</rosparam>
       <param name="rate" value="30"/>
     </node>
