@@ -36,7 +36,6 @@
     <rosparam command="load" file="$(arg hw_config_file)" />
     <!-- Add or overwrite manually configured ips -->
     <rosparam subst_value="True">$(arg robot_ips)</rosparam>
-    <!-- <param name="robot_description" textfile="$(find mmint_combined_panda_config)/urdfs/test.urdf" /> -->
     <param name="robot_description" command="$(find xacro)/xacro '$(find mmint_combined_panda_config)/config/$(arg robot_urdf).urdf.xacro'
                        arm_id_1:=$(arg arm_id_1) arm_id_2:=$(arg arm_id_2)
                        hand_1:=$(arg hand_1) hand_2:=$(arg hand_2)
@@ -55,7 +54,6 @@
                        arm_id_1:=$(arg arm_id_1) arm_id_2:=$(arg arm_id_2)
                        hand_1:=$(arg hand_1) hand_2:=$(arg hand_2)
                        tool_1:=$(arg tool_1) tool_2:=$(arg tool_2)"/>
-      <!-- <param name="robot_description" textfile="$(find mmint_combined_panda_config)/urdfs/test.urdf" /> -->
       <rosparam param="source_list"  subst_value="true">$(arg joint_states_source_list)</rosparam>
       <param name="rate" value="30"/>
     </node>
