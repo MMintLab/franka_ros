@@ -6,6 +6,10 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /TF1
+        - /TF1/Frames1
+        - /InteractiveMarkers1
+        - /InteractiveMarkers2
       Splitter Ratio: 0.6555555462837219
     Tree Height: 1166
   - Class: rviz/Selection
@@ -59,13 +63,9 @@ Visualization Manager:
         All Enabled: false
         base:
           Value: false
-        nebula_EE:
-          Value: true
-        nebula_EE_tip:
+        panda_1_ft:
           Value: false
         panda_1_hand:
-          Value: false
-        panda_1_leftfinger:
           Value: false
         panda_1_link0:
           Value: false
@@ -85,7 +85,13 @@ Visualization Manager:
           Value: false
         panda_1_link8:
           Value: false
-        panda_1_rightfinger:
+        panda_1_tool:
+          Value: false
+        panda_1_tool_tip:
+          Value: false
+        panda_2_EE:
+          Value: false
+        panda_2_EE_tip:
           Value: false
         panda_2_hand:
           Value: false
@@ -111,52 +117,55 @@ Visualization Manager:
           Value: false
         panda_2_rightfinger:
           Value: false
-        rocket_EE:
+        panda_2_tool:
+          Value: false
+        tabletop:
           Value: true
-        rocket_EE_tip:
+        world:
           Value: false
       Marker Alpha: 1
-      Marker Scale: 0.5
+      Marker Scale: 0.25
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        base:
-          panda_1_link0:
-            panda_1_link1:
-              panda_1_link2:
-                panda_1_link3:
-                  panda_1_link4:
-                    panda_1_link5:
-                      panda_1_link6:
-                        panda_1_link7:
-                          panda_1_link8:
-                            nebula_EE:
-                              nebula_EE_tip:
-                                {}
-                            panda_1_hand:
-                              panda_1_leftfinger:
-                                {}
-                              panda_1_rightfinger:
-                                {}
-          panda_2_link0:
-            panda_2_link1:
-              panda_2_link2:
-                panda_2_link3:
-                  panda_2_link4:
-                    panda_2_link5:
-                      panda_2_link6:
-                        panda_2_link7:
-                          panda_2_link8:
-                            panda_2_hand:
-                              panda_2_leftfinger:
-                                {}
-                              panda_2_rightfinger:
-                                {}
-                            rocket_EE:
-                              rocket_EE_tip:
-                                {}
+        world:
+          base:
+            panda_1_link0:
+              panda_1_link1:
+                panda_1_link2:
+                  panda_1_link3:
+                    panda_1_link4:
+                      panda_1_link5:
+                        panda_1_link6:
+                          panda_1_link7:
+                            panda_1_link8:
+                              panda_1_hand:
+                                panda_1_ft:
+                                  panda_1_tool:
+                                    panda_1_tool_tip:
+                                      {}
+            panda_2_link0:
+              panda_2_link1:
+                panda_2_link2:
+                  panda_2_link3:
+                    panda_2_link4:
+                      panda_2_link5:
+                        panda_2_link6:
+                          panda_2_link7:
+                            panda_2_link8:
+                              panda_2_EE:
+                                panda_2_EE_tip:
+                                  {}
+                              panda_2_hand:
+                                panda_2_leftfinger:
+                                  panda_2_tool:
+                                    {}
+                                panda_2_rightfinger:
+                                  {}
+            tabletop:
+              {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -174,20 +183,12 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        nebula_EE:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        nebula_EE_tip:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        panda_1_hand:
+        panda_1_ft:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        panda_1_leftfinger:
+        panda_1_hand:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -236,11 +237,23 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        panda_1_rightfinger:
+        panda_1_tool:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        panda_1_tool_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        panda_2_EE:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        panda_2_EE_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         panda_2_hand:
           Alpha: 1
           Show Axes: false
@@ -300,11 +313,12 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        rocket_EE:
+        panda_2_tool:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        rocket_EE_tip:
+          Value: true
+        tabletop:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -314,9 +328,27 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /panda_1_equilibrium_pose_marker/update
+      Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /panda_2_equilibrium_pose_marker/update
+      Value: true
   Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 186; 186; 186
     Default Light: true
     Fixed Frame: base
     Frame Rate: 30
@@ -342,7 +374,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.144637107849121
+      Distance: 1.8975437879562378
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -350,17 +382,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.2776314616203308
-        Y: -0.32707494497299194
-        Z: 1.0712254047393799
+        X: 0.36789488792419434
+        Y: -0.18013139069080353
+        Z: 1.1107304096221924
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.27479615807533264
+      Pitch: 0.039796192198991776
       Target Frame: <Fixed Frame>
-      Yaw: 5.418622016906738
+      Yaw: 5.80862283706665
     Saved: ~
 Window Geometry:
   Displays:
