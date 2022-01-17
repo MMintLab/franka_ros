@@ -40,7 +40,7 @@ class Panda2ImpedanceController : public controller_interface::MultiInterfaceCon
   std::unique_ptr<franka_hw::FrankaModelHandle> model_handle_;
   std::vector<hardware_interface::JointHandle> joint_handles_;
 
-  double filter_params_{0.005};
+  double filter_params_{0.01};
   double nullspace_stiffness_{20.0};
   double nullspace_stiffness_target_{20.0};
   const double delta_tau_max_{1.0};
@@ -53,6 +53,7 @@ class Panda2ImpedanceController : public controller_interface::MultiInterfaceCon
   Eigen::Quaterniond orientation_d_;
   Eigen::Vector3d position_d_target_;
   Eigen::Quaterniond orientation_d_target_;
+  Eigen::Matrix<double, 6, 1> error;
 
   // Dynamic reconfigure
   std::unique_ptr<dynamic_reconfigure::Server<franka_example_controllers::panda_2_compliance_paramConfig>>

@@ -221,7 +221,7 @@ void Panda1ImpedanceController::panda1ComplianceParamCallback(
 }
 
 void Panda1ImpedanceController::equilibriumPoseCallback(
-    const geometry_msgs::PoseStampedConstPtr& msg) {
+    const geometry_msgs::PoseStampedConstPtr& msg) { 
   position_d_target_ << msg->pose.position.x, msg->pose.position.y, msg->pose.position.z;
   Eigen::Quaterniond last_orientation_d_target(orientation_d_target_);
   orientation_d_target_.coeffs() << msg->pose.orientation.x, msg->pose.orientation.y,

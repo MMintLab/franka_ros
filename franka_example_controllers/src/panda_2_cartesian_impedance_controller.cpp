@@ -141,8 +141,13 @@ void Panda2ImpedanceController::update(const ros::Time& /*time*/,
 
   // compute error to desired pose
   // position error
-  Eigen::Matrix<double, 6, 1> error;
   error.head(3) << position - position_d_;
+  // std::cout << "position_d_target_\n" ;
+  // std::cout << position_d_target_ << "\n\n";
+  // std::cout << "position_d\n" ;
+  // std::cout << position_d_ << "\n\n";
+  // std::cout << "position_error_\n" ;
+  // std::cout << error.head(3) << "\n\n";
 
   // orientation error
   if (orientation_d_.coeffs().dot(orientation.coeffs()) < 0.0) {
@@ -222,6 +227,7 @@ void Panda2ImpedanceController::complianceParamCallback(
 
 void Panda2ImpedanceController::panda2EquilibriumPoseCallback(
     const geometry_msgs::PoseStampedConstPtr& msg) {
+  std::cout << "ENTERED CALLBACK \n";
   position_d_target_ << msg->pose.position.x, msg->pose.position.y, msg->pose.position.z;
   Eigen::Quaterniond last_orientation_d_target(orientation_d_target_);
   orientation_d_target_.coeffs() << msg->pose.orientation.x, msg->pose.orientation.y,
@@ -229,6 +235,11 @@ void Panda2ImpedanceController::panda2EquilibriumPoseCallback(
   if (last_orientation_d_target.coeffs().dot(orientation_d_target_.coeffs()) < 0.0) {
     orientation_d_target_.coeffs() << -orientation_d_target_.coeffs();
   }
+  std::cout << "position_d_target_\n" ;
+  std::cout << position_d_target_ << "\n\n";
+  std::cout << "position_error\n" ;
+  std::cout << Panda2ImpedanceController::error.head(3) << "\n\n";
+  
 }
 
 }  // namespace franka_example_controllers
