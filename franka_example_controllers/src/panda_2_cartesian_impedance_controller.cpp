@@ -23,6 +23,8 @@ bool Panda2ImpedanceController::init(hardware_interface::RobotHW* robot_hw,
       "/panda_2_equilibrium_pose", 20, &Panda2ImpedanceController::panda2EquilibriumPoseCallback, this,
       ros::TransportHints().reliable().tcpNoDelay());
 
+  panda_2_EE_error_pub_ = node_handle.advertise<std_msgs::Float64MultiArray>("/panda_2_EE_error", 5);
+
   std::string arm_id;
   if (!node_handle.getParam("arm_id", arm_id)) {
     ROS_ERROR_STREAM("Panda2ImpedanceController: Could not read parameter arm_id for panda_2");
@@ -142,12 +144,6 @@ void Panda2ImpedanceController::update(const ros::Time& /*time*/,
   // compute error to desired pose
   // position error
   error.head(3) << position - position_d_;
-  // std::cout << "position_d_target_\n" ;
-  // std::cout << position_d_target_ << "\n\n";
-  // std::cout << "position_d\n" ;
-  // std::cout << position_d_ << "\n\n";
-  // std::cout << "position_error_\n" ;
-  // std::cout << error.head(3) << "\n\n";
 
   // orientation error
   if (orientation_d_.coeffs().dot(orientation.coeffs()) < 0.0) {
@@ -158,6 +154,9 @@ void Panda2ImpedanceController::update(const ros::Time& /*time*/,
   error.tail(3) << error_quaternion.x(), error_quaternion.y(), error_quaternion.z();
   // Transform to base frame
   error.tail(3) << -transform.linear() * error.tail(3);
+
+  tf::matrixEigenToMsg(error, EE_error_msg);
+  panda_2_EE_error_pub_.publish(EE_error_msg);
 
   // compute control
   // allocate variables

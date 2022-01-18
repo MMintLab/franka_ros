@@ -14,6 +14,8 @@
 #include <ros/node_handle.h>
 #include <ros/time.h>
 #include <Eigen/Dense>
+#include <eigen_conversions/eigen_msg.h>
+#include <std_msgs/Float64MultiArray.h>
 
 #include <franka_example_controllers/panda_2_compliance_paramConfig.h>
 #include <franka_hw/franka_model_interface.h>
@@ -65,6 +67,10 @@ class Panda2ImpedanceController : public controller_interface::MultiInterfaceCon
   // Equilibrium pose subscriber
   ros::Subscriber panda_2_sub_equilibrium_pose_;
   void panda2EquilibriumPoseCallback(const geometry_msgs::PoseStampedConstPtr& msg);
+
+  // Error publisher
+  ros::Publisher panda_2_EE_error_pub_;
+  std_msgs::Float64MultiArray EE_error_msg;  
 };
 
 }  // namespace franka_example_controllers
