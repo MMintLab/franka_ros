@@ -3,7 +3,7 @@ project(franka_msgs)
 
 find_package(catkin REQUIRED COMPONENTS message_generation std_msgs actionlib_msgs)
 
-add_message_files(FILES Errors.msg FrankaState.msg RobotModel.msg)
+add_message_files(FILES Errors.msg FrankaState.msg)
 
 add_service_files(FILES
   SetCartesianImpedance.srv
