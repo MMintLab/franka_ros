@@ -6,7 +6,8 @@ joint_names:
   - panda_2_joint5
   - panda_2_joint6
   - panda_2_joint7
-arm_id: panda
+arm_id: panda_2
+robot_ip: 192.168.1.23
 # Configure the threshold angle for printing joint limit warnings.
 joint_limit_warning_threshold: 0.1 # [rad]
 # Activate rate limiter? [true|false]
