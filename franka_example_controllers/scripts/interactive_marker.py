@@ -11,10 +11,12 @@ from visualization_msgs.msg import InteractiveMarker, \
 from geometry_msgs.msg import PoseStamped
 from franka_msgs.msg import FrankaState
 
+from visualization_msgs.msg import Marker
+
 marker_pose = PoseStamped()
 pose_pub = None
 # [[min_x, max_x], [min_y, max_y], [min_z, max_z]]
-position_limits = [[-0.6, 0.6], [-0.6, 0.6], [0.05, 0.9]]
+position_limits = [[-0.6, 0.9], [-0.6, 0.6], [0.05, 1.1]]
 
 
 def publisher_callback(msg, link_name):
@@ -39,8 +41,17 @@ def process_feedback(feedback):
 
 
 def wait_for_initial_pose():
-    msg = rospy.wait_for_message("franka_state_controller/franka_states",
-                                 FrankaState)  # type: FrankaState
+
+    print("YAAAAA")
+
+    # msg = rospy.wait_for_message("franka_state_controller/franka_states",
+    #                              FrankaState)  # type: FrankaState
+    msg = rospy.wait_for_message("/combined_panda/panda_2_state_controller/franka_states",
+                                    FrankaState)  # type: FrankaState
+
+    # print(msg)
+
+    print("Here WE GOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
     initial_quaternion = \
         tf.transformations.quaternion_from_matrix(
@@ -60,7 +71,13 @@ def wait_for_initial_pose():
 if __name__ == "__main__":
     rospy.init_node("equilibrium_pose_node")
     listener = tf.TransformListener()
+
+    print("yaaaaaa2")
     link_name = rospy.get_param("~link_name")
+
+    print(link_name)
+
+    print("yaaaaaa")
 
     wait_for_initial_pose()
 
@@ -130,6 +147,33 @@ if __name__ == "__main__":
     control.name = "move_z"
     control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
     int_marker.controls.append(control)
+
+    sphere_control = InteractiveMarkerControl()
+    sphere_control.always_visible = True
+
+    # Define the sphere marker
+    sphere_marker = Marker()
+    sphere_marker.type = Marker.SPHERE
+    sphere_marker.scale.x = 0.1  # Set the size of the sphere
+    sphere_marker.scale.y = 0.1
+    sphere_marker.scale.z = 0.1
+    sphere_marker.color.r = 0.0  # Set color of the sphere
+    sphere_marker.color.g = 1.0
+    sphere_marker.color.b = 0.0
+    sphere_marker.color.a = 1.0  # Alpha value for transparency
+
+    # Add the sphere to the control
+    sphere_control.markers.append(sphere_marker)
+
+    # Set the interaction mode to MOVE_3D
+    sphere_control.interaction_mode = InteractiveMarkerControl.MOVE_3D
+
+    # Add the sphere control to the interactive marker
+    int_marker.controls.append(sphere_control)
+
+
+    print("hello")
+
     server.insert(int_marker, process_feedback)
 
     server.applyChanges()

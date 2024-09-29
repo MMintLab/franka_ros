@@ -28,12 +28,19 @@ bool CartesianImpedanceExampleController::init(hardware_interface::RobotHW* robo
     ROS_ERROR_STREAM("CartesianImpedanceExampleController: Could not read parameter arm_id");
     return false;
   }
+  else {
+    ROS_INFO_STREAM("CHECCCCCK THIS OUTTTT arm_id: " << arm_id);
+  }
   std::vector<std::string> joint_names;
   if (!node_handle.getParam("joint_names", joint_names) || joint_names.size() != 7) {
     ROS_ERROR(
         "CartesianImpedanceExampleController: Invalid or no joint_names parameters provided, "
         "aborting controller init!");
     return false;
+  }
+  else {
+    ROS_INFO_STREAM("CHECCCCCK THIS OUTTTT joint_names: " << joint_names[0]);
+    ROS_INFO_STREAM("CHECCCCCK THIS OUTTTT joint_names: " << joint_names[6]);
   }
 
   auto* model_interface = robot_hw->get<franka_hw::FrankaModelInterface>();
@@ -45,7 +52,7 @@ bool CartesianImpedanceExampleController::init(hardware_interface::RobotHW* robo
   try {
     model_handle_ = std::make_unique<franka_hw::FrankaModelHandle>(
         model_interface->getHandle(arm_id + "_model"));
-        ROS_INFO_STREAM("arm_id: " << arm_id);
+    ROS_INFO_STREAM("ayyyyooooo arm_id: " << arm_id);
   } catch (hardware_interface::HardwareInterfaceException& ex) {
     ROS_ERROR_STREAM(
         "CartesianImpedanceExampleController: Exception getting model handle from interface: "
@@ -62,6 +69,7 @@ bool CartesianImpedanceExampleController::init(hardware_interface::RobotHW* robo
   try {
     state_handle_ = std::make_unique<franka_hw::FrankaStateHandle>(
         state_interface->getHandle(arm_id + "_robot"));
+        ROS_INFO_STREAM("wioooooooiwoiwo arm_id: " << arm_id);
   } catch (hardware_interface::HardwareInterfaceException& ex) {
     ROS_ERROR_STREAM(
         "CartesianImpedanceExampleController: Exception getting state handle from interface: "

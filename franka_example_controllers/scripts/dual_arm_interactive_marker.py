@@ -138,6 +138,14 @@ if __name__ == "__main__":
         PoseStamped,
         queue_size=1)
 
+
+    # MARKER POSE SHOULD COME FROM PREV PANDA 2 STATE
+    # REFER TO INTERACTIVE MARKER
+
+
+
+
+
     # Interactive marker settings
     server = InteractiveMarkerServer("target_pose_marker")
     int_marker = InteractiveMarker()
