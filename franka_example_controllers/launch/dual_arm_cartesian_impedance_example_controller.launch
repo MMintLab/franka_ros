@@ -3,7 +3,7 @@
   <!--Be sure to pass the IPs of your pandas like robot_ips:="{panda_1/robot_ip: <my_ip_1>, panda_2/robot_ip: <my_ip_2>}"   -->
   <arg name="robot_ips" />
 
-  <arg name="robot_id" default="panda_dual" />
+  <arg name="robot_id" default="combined_panda" />
   <arg name="rviz" default="true" />
   <arg name="rqt" default="true" />
 

@@ -204,23 +204,33 @@ void DualArmCartesianImpedanceExampleController::starting(const ros::Time& /*tim
   franka::RobotState robot_state_right =
       arms_data_.at(right_arm_id_).state_handle_->getRobotState();
   franka::RobotState robot_state_left = arms_data_.at(left_arm_id_).state_handle_->getRobotState();
-  Eigen::Affine3d Ol_T_EEl(Eigen::Matrix4d::Map(  // NOLINT (readability-identifier-naming)
-      robot_state_left.O_T_EE.data()));           // NOLINT (readability-identifier-naming)
-  Eigen::Affine3d Or_T_EEr(Eigen::Matrix4d::Map(  // NOLINT (readability-identifier-naming)
-      robot_state_right.O_T_EE.data()));          // NOLINT (readability-identifier-naming)
-  EEr_T_EEl_ =
-      Or_T_EEr.inverse() * Ol_T_Or_.inverse() * Ol_T_EEl;  // NOLINT (readability-identifier-naming)
+  // Eigen::Affine3d Ol_T_EEl(Eigen::Matrix4d::Map(  // NOLINT (readability-identifier-naming)
+  //     robot_state_left.O_T_EE.data()));           // NOLINT (readability-identifier-naming)
+  // Eigen::Affine3d Or_T_EEr(Eigen::Matrix4d::Map(  // NOLINT (readability-identifier-naming)
+  //     robot_state_right.O_T_EE.data()));          // NOLINT (readability-identifier-naming)
+  // EEr_T_EEl_ =
+  //     Or_T_EEr.inverse() * Ol_T_Or_.inverse() * Ol_T_EEl;  // NOLINT (readability-identifier-naming)
+  // EEl_T_C_.setIdentity();
+  // Eigen::Vector3d EEr_r_EEr_EEl =  // NOLINT (readability-identifier-naming)
+  //     EEr_T_EEl_.translation();    // NOLINT (readability-identifier-naming)
+  // EEl_T_C_.translation() = -0.5 * EEr_T_EEl_.inverse().rotation() * EEr_r_EEr_EEl;
+
+  Eigen::Affine3d Ol_T_EEl(Eigen::Matrix4d::Map(robot_state_left.O_T_EE.data()));
+  Eigen::Affine3d Or_T_EEr(Eigen::Matrix4d::Map(robot_state_right.O_T_EE.data()));
+  
+  EEr_T_EEl_ = Or_T_EEr.inverse() * Ol_T_Or_.inverse() * Ol_T_EEl;
+  
+  // Set EEl_T_C_ to identity or compute as needed
   EEl_T_C_.setIdentity();
-  Eigen::Vector3d EEr_r_EEr_EEl =  // NOLINT (readability-identifier-naming)
-      EEr_T_EEl_.translation();    // NOLINT (readability-identifier-naming)
-  EEl_T_C_.translation() = -0.5 * EEr_T_EEl_.inverse().rotation() * EEr_r_EEr_EEl;
 }
 
 void DualArmCartesianImpedanceExampleController::update(const ros::Time& /*time*/,
                                                         const ros::Duration& /*period*/) {
-  for (auto& arm_data : arms_data_) {
-    updateArm(arm_data.second);  // NOLINT
-  }
+  // Update only the left arm
+  auto& left_arm_data = arms_data_.at(left_arm_id_);
+  updateArm(left_arm_data);  // Only update the left arm
+  
+  // Publish centering frame pose at a defined rate
   if (publish_rate_()) {
     publishCenteringPose();
   }
@@ -356,37 +366,46 @@ void DualArmCartesianImpedanceExampleController::targetPoseCallback(
       return;
     }
 
-    // Set target for the left robot.
-    auto& left_arm_data = arms_data_.at(left_arm_id_);
-    Eigen::Affine3d Ol_T_C{};  // NOLINT (readability-identifier-naming)
-    tf::poseMsgToEigen(msg->pose, Ol_T_C);
-    Eigen::Affine3d Ol_T_EEl_d =      // NOLINT (readability-identifier-naming)
-        Ol_T_C * EEl_T_C_.inverse();  // NOLINT (readability-identifier-naming)
-    left_arm_data.position_d_target_ = Ol_T_EEl_d.translation();
-    Eigen::Quaterniond last_orientation_d_target(left_arm_data.orientation_d_target_);
-    Eigen::Quaterniond new_orientation_target(Ol_T_EEl_d.rotation());
-    if (last_orientation_d_target.coeffs().dot(new_orientation_target.coeffs()) < 0.0) {
-      new_orientation_target.coeffs() << -new_orientation_target.coeffs();
-    }
-    Ol_T_EEl_d.linear() = new_orientation_target.matrix();
-    left_arm_data.orientation_d_target_ = Ol_T_EEl_d.rotation();
+    // // Set target for the left robot.
+    // auto& left_arm_data = arms_data_.at(left_arm_id_);
+    // Eigen::Affine3d Ol_T_C{};  // NOLINT (readability-identifier-naming)
+    // tf::poseMsgToEigen(msg->pose, Ol_T_C);
+    // Eigen::Affine3d Ol_T_EEl_d =      // NOLINT (readability-identifier-naming)
+    //     Ol_T_C * EEl_T_C_.inverse();  // NOLINT (readability-identifier-naming)
+    // left_arm_data.position_d_target_ = Ol_T_EEl_d.translation();
+    // Eigen::Quaterniond last_orientation_d_target(left_arm_data.orientation_d_target_);
+    // Eigen::Quaterniond new_orientation_target(Ol_T_EEl_d.rotation());
+    // if (last_orientation_d_target.coeffs().dot(new_orientation_target.coeffs()) < 0.0) {
+    //   new_orientation_target.coeffs() << -new_orientation_target.coeffs();
+    // }
+    // Ol_T_EEl_d.linear() = new_orientation_target.matrix();
+    // left_arm_data.orientation_d_target_ = Ol_T_EEl_d.rotation();
 
-    // Compute target for the right endeffector given the static desired transform from left to
-    // right endeffector.
-    Eigen::Affine3d Or_T_EEr_d = Ol_T_Or_.inverse()     // NOLINT (readability-identifier-naming)
-                                 * Ol_T_EEl_d *         // NOLINT (readability-identifier-naming)
-                                 EEr_T_EEl_.inverse();  // NOLINT (readability-identifier-naming)
-    auto& right_arm_data = arms_data_.at(right_arm_id_);
-    right_arm_data.position_d_target_ =
-        Or_T_EEr_d.translation();  // NOLINT (readability-identifier-naming)
-    last_orientation_d_target = Eigen::Quaterniond(right_arm_data.orientation_d_target_);
-    right_arm_data.orientation_d_target_ =
-        Or_T_EEr_d.rotation();  // NOLINT (readability-identifier-naming)
-    if (last_orientation_d_target.coeffs().dot(right_arm_data.orientation_d_target_.coeffs()) <
-        0.0) {
-      right_arm_data.orientation_d_target_.coeffs()
-          << -right_arm_data.orientation_d_target_.coeffs();
-    }
+    auto& left_arm_data = arms_data_.at(left_arm_id_);
+  
+    Eigen::Affine3d Ol_T_EEl_target;
+    tf::poseMsgToEigen(msg->pose, Ol_T_EEl_target);
+    
+    left_arm_data.position_d_target_ = Ol_T_EEl_target.translation();
+    left_arm_data.orientation_d_target_ = Eigen::Quaterniond(Ol_T_EEl_target.rotation());
+
+
+    // // Compute target for the right endeffector given the static desired transform from left to
+    // // right endeffector.
+    // Eigen::Affine3d Or_T_EEr_d = Ol_T_Or_.inverse()     // NOLINT (readability-identifier-naming)
+    //                              * Ol_T_EEl_d *         // NOLINT (readability-identifier-naming)
+    //                              EEr_T_EEl_.inverse();  // NOLINT (readability-identifier-naming)
+    // auto& right_arm_data = arms_data_.at(right_arm_id_);
+    // right_arm_data.position_d_target_ =
+    //     Or_T_EEr_d.translation();  // NOLINT (readability-identifier-naming)
+    // last_orientation_d_target = Eigen::Quaterniond(right_arm_data.orientation_d_target_);
+    // right_arm_data.orientation_d_target_ =
+    //     Or_T_EEr_d.rotation();  // NOLINT (readability-identifier-naming)
+    // if (last_orientation_d_target.coeffs().dot(right_arm_data.orientation_d_target_.coeffs()) <
+    //     0.0) {
+    //   right_arm_data.orientation_d_target_.coeffs()
+    //       << -right_arm_data.or  ientation_d_target_.coeffs();
+    // }
 
   } catch (std::out_of_range& ex) {
     ROS_ERROR_STREAM("DualArmCartesianImpedanceExampleController: Exception setting target poses.");
@@ -394,16 +413,36 @@ void DualArmCartesianImpedanceExampleController::targetPoseCallback(
 }
 
 void DualArmCartesianImpedanceExampleController::publishCenteringPose() {
+  // if (center_frame_pub_.trylock()) {
+  //   franka::RobotState robot_state_left =
+  //       arms_data_.at(left_arm_id_).state_handle_->getRobotState();
+  //   Eigen::Affine3d Ol_T_EEl(Eigen::Matrix4d::Map(  // NOLINT (readability-identifier-naming)
+  //       robot_state_left.O_T_EE.data()));           // NOLINT (readability-identifier-naming)
+  //   Eigen::Affine3d Ol_T_C = Ol_T_EEl * EEl_T_C_;   // NOLINT (readability-identifier-naming)
+  //   tf::poseEigenToMsg(Ol_T_C, center_frame_pub_.msg_.pose);
+  //   center_frame_pub_.msg_.header.frame_id = left_arm_id_ + "_link0";
+  //   center_frame_pub_.unlockAndPublish();
+  // }
   if (center_frame_pub_.trylock()) {
     franka::RobotState robot_state_left =
         arms_data_.at(left_arm_id_).state_handle_->getRobotState();
-    Eigen::Affine3d Ol_T_EEl(Eigen::Matrix4d::Map(  // NOLINT (readability-identifier-naming)
-        robot_state_left.O_T_EE.data()));           // NOLINT (readability-identifier-naming)
-    Eigen::Affine3d Ol_T_C = Ol_T_EEl * EEl_T_C_;   // NOLINT (readability-identifier-naming)
-    tf::poseEigenToMsg(Ol_T_C, center_frame_pub_.msg_.pose);
+    
+    // Get the current end-effector pose
+    Eigen::Affine3d Ol_T_EEl(Eigen::Matrix4d::Map(robot_state_left.O_T_EE.data()));
+    
+    // Convert Eigen pose to ROS geometry_msgs::Pose
+    geometry_msgs::Pose ee_pose;
+    tf::poseEigenToMsg(Ol_T_EEl, ee_pose);
+    
+    // Set up the message
+    center_frame_pub_.msg_.header.stamp = ros::Time::now();
     center_frame_pub_.msg_.header.frame_id = left_arm_id_ + "_link0";
+    center_frame_pub_.msg_.pose = ee_pose;
+    
+    // Publish the message
     center_frame_pub_.unlockAndPublish();
   }
+
 }
 
 }  // namespace franka_example_controllers
